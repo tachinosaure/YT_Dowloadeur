@@ -33,38 +33,25 @@ def validate_url(url):
     return bool(URL_PATTERN.search(url))
 
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        url = request.form.get('url', '').strip()
-        mode = request.form.get('mode', 'video')
-
-        if not url:
-            flash('Veuillez saisir une URL YouTube valide.', 'error')
-            return redirect(url_for('index'))
-
-        if not validate_url(url):
-            flash('Veuillez utiliser une URL YouTube valide.', 'error')
-            return redirect(url_for('index'))
-
-        return redirect(url_for('download', mode=mode, url=url))
-
-    return render_template('index.html')
+def cleanup(path):
+    try:
+        for f in os.listdir(path):
+            try:
+                os.remove(os.path.join(path, f))
+            except OSError:
+                pass
+        os.rmdir(path)
+    except OSError:
+        pass
 
 
-@app.route('/download')
-def download():
-    url = request.args.get('url', '')
-    mode = request.args.get('mode', 'video')
-
-    if not url or not validate_url(url):
-        flash('URL invalide ou manquante.', 'error')
-        return redirect(url_for('index'))
-
+def download_file(url, mode, cookiefile=None):
     temp_dir = tempfile.mkdtemp(prefix='yt_dl_')
     outtmpl = os.path.join(temp_dir, '%(title).200s.%(ext)s')
     ydl_opts = (YDL_OPTS_AUDIO if mode == 'audio' else YDL_OPTS_VIDEO).copy()
     ydl_opts['outtmpl'] = outtmpl
+    if cookiefile:
+        ydl_opts['cookiefile'] = cookiefile
 
     try:
         with YoutubeDL(ydl_opts) as ydl:
@@ -73,24 +60,61 @@ def download():
             if mode == 'audio':
                 filename = os.path.splitext(filename)[0] + '.mp3'
 
+        return filename, temp_dir
+    except Exception:
+        cleanup(temp_dir)
+        raise
+
+
+@app.route('/', methods=['GET'])
+def index():
+    return render_template('index.html')
+
+
+@app.route('/download', methods=['GET', 'POST'])
+def download():
+    temp_cookie_dir = None
+    cookiefile = None
+
+    if request.method == 'POST':
+        url = request.form.get('url', '').strip()
+        mode = request.form.get('mode', 'video')
+        cookies = request.files.get('cookies')
+
+        if cookies and cookies.filename:
+            temp_cookie_dir = tempfile.mkdtemp(prefix='yt_dl_cookies_')
+            cookiefile = os.path.join(temp_cookie_dir, 'cookies.txt')
+            cookies.save(cookiefile)
+    else:
+        url = request.args.get('url', '')
+        mode = request.args.get('mode', 'video')
+
+    if not url or not validate_url(url):
+        flash('URL invalide ou manquante.', 'error')
+        if temp_cookie_dir:
+            cleanup(temp_cookie_dir)
+        return redirect(url_for('index'))
+
+    temp_dir = None
+    try:
+        filename, temp_dir = download_file(url, mode, cookiefile)
         return send_file(filename, as_attachment=True)
     except Exception as exc:
-        flash(f'Erreur pendant le téléchargement : {exc}', 'error')
+        error_message = str(exc)
+        if 'Sign in to confirm you’re not a bot' in error_message:
+            flash(
+                'YouTube demande une connexion. Exportez vos cookies depuis votre navigateur et téléchargez-les ici.',
+                'error'
+            )
+        else:
+            flash(f'Erreur pendant le téléchargement : {error_message}', 'error')
         return redirect(url_for('index'))
     finally:
-        def cleanup(path):
-            try:
-                for f in os.listdir(path):
-                    try:
-                        os.remove(os.path.join(path, f))
-                    except OSError:
-                        pass
-                os.rmdir(path)
-            except OSError:
-                pass
-
-        threading.Thread(target=cleanup, args=(temp_dir,), daemon=True).start()
+        if temp_dir:
+            threading.Thread(target=cleanup, args=(temp_dir,), daemon=True).start()
+        if temp_cookie_dir:
+            threading.Thread(target=cleanup, args=(temp_cookie_dir,), daemon=True).start()
 
 
 if __name__ == '__main__':
-    app.run(host='', port=, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
