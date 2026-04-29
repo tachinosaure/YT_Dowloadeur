@@ -1,2 +1,3 @@
-Flask>=2.0
-yt-dlp>=2026.4.1
+Flask
+yt-dlp
+gunicorn
