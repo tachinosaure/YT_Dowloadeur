@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Télécharger YouTube 1080p / MP3</title>
+    <link rel="stylesheet" href="/static/style.css">
+  </head>
+  <body>
+    <main>
+      <h1>Téléchargeur YouTube local</h1>
+      <p>Entrez un lien YouTube et choisissez le format.</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="messages">
+        {% for category, message in messages %}
+        <div class="message {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
+
+      <form method="post" action="/">
+        <label for="url">Lien YouTube</label>
+        <input id="url" name="url" type="url" placeholder="https://www.youtube.com/watch?v=..." required>
+
+        <label>Format</label>
+        <div class="radio-group">
+          <label><input type="radio" name="mode" value="video" checked> Vidéo 1080p</label>
+          <label><input type="radio" name="mode" value="audio"> MP3</label>
+        </div>
+
+        <button type="submit">Télécharger</button>
+      </form>
+
+      <div class="note">
+        <strong>Note :</strong> Le téléchargement démarre automatiquement après validation. L'application fonctionne localement sur <code>http://127.0.0.1:5000</code>.
+      </div>
+    </main>
+  </body>
+</html>
