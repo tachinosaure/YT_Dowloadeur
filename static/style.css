@@ -1,0 +1,101 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(180deg, #0b1220 0%, #1b2a45 100%);
+  color: #eef2ff;
+  min-height: 100vh;
+}
+
+main {
+  max-width: 520px;
+  margin: 5% auto;
+  padding: 32px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+}
+
+h1 {
+  margin-top: 0;
+  font-size: 2rem;
+}
+
+p {
+  margin-bottom: 1.5rem;
+  color: #d8e0ff;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+input[type="url"] {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #eef2ff;
+  margin-bottom: 1rem;
+}
+
+input[type="url"]:focus {
+  outline: none;
+  border-color: #7c8cff;
+}
+
+.radio-group {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.radio-group label {
+  font-weight: 400;
+}
+
+button {
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 12px;
+  background: #7c8cff;
+  color: #0b1220;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #6172ff;
+}
+
+.messages {
+  margin-bottom: 1rem;
+}
+
+.message {
+  padding: 12px 14px;
+  border-radius: 12px;
+  margin-bottom: 0.75rem;
+}
+
+.message.error {
+  background: rgba(255, 95, 95, 0.2);
+  color: #ffe3e3;
+}
+
+.note {
+  margin-top: 1.5rem;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+}
+
+code {
+  background: rgba(255, 255, 255, 0.12);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
