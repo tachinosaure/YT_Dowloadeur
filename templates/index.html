@@ -21,9 +21,13 @@
       {% endif %}
       {% endwith %}
 
-      <form method="post" action="/">
+      <form method="post" action="/download" enctype="multipart/form-data">
         <label for="url">Lien YouTube</label>
         <input id="url" name="url" type="url" placeholder="https://www.youtube.com/watch?v=..." required>
+
+        <label for="cookies">Fichier de cookies YouTube (optionnel)</label>
+        <input id="cookies" name="cookies" type="file" accept=".txt">
+        <p class="small">Utilisez ce champ si YouTube demande une authentification ou si le téléchargement échoue.</p>
 
         <label>Format</label>
         <div class="radio-group">
@@ -35,7 +39,8 @@
       </form>
 
       <div class="note">
-        <strong>Note :</strong> Le téléchargement démarre automatiquement après validation. L'application fonctionne localement sur <code></code>.
+        <strong>Note :</strong> Le téléchargement démarre automatiquement après validation. Si YouTube demande une connexion, exportez vos cookies et joignez-les au formulaire.<br>
+        <code>yt-dlp --cookies-from-browser chrome --cookies /path/to/cookies.txt</code>
       </div>
     </main>
   </body>
